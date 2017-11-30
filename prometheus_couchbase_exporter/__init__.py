@@ -56,7 +56,8 @@ class CouchbaseCollector(object):
         if metric_value is not False:
             if isinstance(metric_value, list):
                 metric_value = sum(metric_value) / float(len(metric_value))
-            self.gauges[metric_id] = GaugeMetricFamily('%s_%s' % (metric_name, metric_id), '%s' % metric_id, value=None, labels=metrics['labels'])
+            if not metric_id in self.gauges:
+                self.gauges[metric_id] = GaugeMetricFamily('%s_%s' % (metric_name, metric_id), '%s' % metric_id, value=None, labels=metrics['labels'])
             self.gauges[metric_id].add_metric(gauges, value=metric_value)
 
     """
@@ -80,9 +81,16 @@ class CouchbaseCollector(object):
                         self._add_metrics(bucket_metrics, self.METRIC_PREFIX + 'bucket_stats', [bucket['name']], bucket_stats["op"]["samples"])
 
     """
+    Clear gauges
+    """
+    def _clear_gauges(self):
+        self.gauges = {}
+
+    """
     Collect each metric defined in external module statsmetrics
     """
     def collect(self):
+        self._clear_gauges()
         for api_key,api_values in self.metrics.items():
             # Request data for each url
             couchbase_data = self._request_data(self.BASE_URL + api_values['url'])
@@ -129,3 +137,4 @@ def main():
 	except KeyboardInterrupt:
 		print(" Interrupted")
 		exit(0)
+		
