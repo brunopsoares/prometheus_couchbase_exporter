@@ -40,6 +40,7 @@ class CouchbaseCollector(object):
 
         if response.status_code != requests.codes.ok:
             print('Response Status ({0}): {1}'.format(response.status_code, response.text))
+            sys.exit(1)
 
         result = response.json()
         return result
@@ -65,21 +66,21 @@ class CouchbaseCollector(object):
     Collect cluster, nodes, bucket and bucket details metrics
     """
     def _collect_metrics(self, key, values, couchbase_data):
-            if key == 'cluster':
+        if key == 'cluster':
+            for metrics in values['metrics']:
+                self._add_metrics(metrics, self.METRIC_PREFIX + 'cluster', [], couchbase_data)
+        elif key == 'nodes':
+            for node in couchbase_data['nodes']:
                 for metrics in values['metrics']:
-                    self._add_metrics(metrics, self.METRIC_PREFIX + 'cluster', [], couchbase_data)
-            elif key == 'nodes':
-                for node in couchbase_data['nodes']:
-                    for metrics in values['metrics']:
-                        self._add_metrics(metrics, self.METRIC_PREFIX + 'node', [node['hostname']], node)
-            elif key == 'buckets':
-                for bucket in couchbase_data:
-                    for metrics in values['metrics']:
-                        self._add_metrics(metrics, self.METRIC_PREFIX + 'bucket', [bucket['name']], bucket)
-                    # Get detailed stats for each bucket
-                    bucket_stats = self._request_data(self.BASE_URL + bucket['stats']['uri'])
-                    for bucket_metrics in values['bucket_stats']:
-                        self._add_metrics(bucket_metrics, self.METRIC_PREFIX + 'bucket_stats', [bucket['name']], bucket_stats["op"]["samples"])
+                    self._add_metrics(metrics, self.METRIC_PREFIX + 'node', [node['hostname']], node)
+        elif key == 'buckets':
+            for bucket in couchbase_data:
+                for metrics in values['metrics']:
+                    self._add_metrics(metrics, self.METRIC_PREFIX + 'bucket', [bucket['name']], bucket)
+                # Get detailed stats for each bucket
+                bucket_stats = self._request_data(self.BASE_URL + bucket['stats']['uri'])
+                for bucket_metrics in values['bucket_stats']:
+                    self._add_metrics(bucket_metrics, self.METRIC_PREFIX + 'bucket_stats', [bucket['name']], bucket_stats["op"]["samples"])
 
     """
     Clear gauges
@@ -126,6 +127,7 @@ def parse_args():
     )
     return parser.parse_args()
 
+#if __name__ == '__main__':
 def main():
 	try:
 		args = parse_args()
