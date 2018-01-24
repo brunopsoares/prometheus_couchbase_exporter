@@ -49,6 +49,7 @@ class CouchbaseCollector(object):
     """
     def _add_metrics(self, metrics, metric_name, metric_gauges, data):
         metric_id = re.sub('(\.)', '_', metrics['id']).lower()
+	metric_id = re.sub('(\+)', '_plus_', metric_id)
         metric_value = self._dot_get(metrics['id'], data)
         gauges = [metric_id]
         for gauge in metric_gauges:
