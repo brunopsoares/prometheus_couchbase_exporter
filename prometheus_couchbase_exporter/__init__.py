@@ -49,7 +49,7 @@ class CouchbaseCollector(object):
     """
     def _add_metrics(self, metrics, metric_name, metric_gauges, data):
         metric_id = re.sub('(\.)', '_', metrics['id']).lower()
-	metric_id = re.sub('(\+)', '_plus_', metric_id)
+        metric_id = re.sub('(\+)', '_plus_', metric_id)
         metric_value = self._dot_get(metrics['id'], data)
         gauges = [metric_id]
         for gauge in metric_gauges:
@@ -126,14 +126,13 @@ def parse_args():
     )
     return parser.parse_args()
 
-#if __name__ == '__main__':
 def main():
 	try:
 		args = parse_args()
 		port = int(args.port)
 		REGISTRY.register(CouchbaseCollector(args.couchbase))
 		start_http_server(port)
-		print "Serving at port: ", port
+		print("Serving at port: %s" % port)
 		while True: time.sleep(1)
 	except KeyboardInterrupt:
 		print(" Interrupted")
