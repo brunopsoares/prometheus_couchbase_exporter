@@ -8,7 +8,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.rst'), encodin
 setup(
     name='prometheus-couchbase-exporter',
 
-    version='1.0.0',
+    version='1.0.3',
 
     description='Couchbase query Prometheus exporter',
     long_description=long_description,

@@ -1,6 +1,7 @@
 from prometheus_client import start_http_server
 from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily, REGISTRY
 from statsmetrics import couchbase as couchbase_metrics
+from functools import reduce
 
 from operator import getitem
 from requests.auth import HTTPBasicAuth
